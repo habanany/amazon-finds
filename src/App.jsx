@@ -2,12 +2,15 @@ import React from 'react';
 import './index.css';
 
 // Reusable, 100% compliant Product Component
-const ProductCard = ({ title, description, placeholderImg, affiliateLink }) => {
+const ProductCard = ({ title, description, imageUrl, placeholderImg, affiliateLink }) => {
   return (
     <div className="product-card">
       <div className="product-image">
-        {/* Placeholder for the image. In production, use Amazon SiteStripe Image HTML here! */}
-        <div style={{ fontSize: '3rem' }}>{placeholderImg}</div>
+        {imageUrl ? (
+          <img src={imageUrl} alt={title} style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain' }} />
+        ) : (
+          <div style={{ fontSize: '3rem' }}>{placeholderImg}</div>
+        )}
       </div>
       <div className="product-content">
         <h3>{title}</h3>
@@ -57,6 +60,7 @@ function App() {
             title="Try Audible Premium Plus (Free Trial)"
             description="Listen to thousands of audiobooks and podcasts. Sign up for a free trial today and get your first audiobook completely free!"
             placeholderImg="📚"
+            imageUrl=""
             affiliateLink="https://amzn.to/3RH54g5"
           />
 
@@ -65,6 +69,7 @@ function App() {
             title="Ergonomic Developer Keyboard"
             description="Split layout mechanical keyboard designed to reduce wrist strain during long coding marathons."
             placeholderImg="⌨️"
+            imageUrl=""
             affiliateLink="https://amazon.com/"
           />
 
@@ -73,6 +78,7 @@ function App() {
             title="Ultra-Wide 4K Monitor"
             description="Massive screen real estate to fit your terminal, IDE, and browser side-by-side without alt-tabbing."
             placeholderImg="🖥️"
+            imageUrl=""
             affiliateLink="https://amazon.com/"
           />
         </div>
