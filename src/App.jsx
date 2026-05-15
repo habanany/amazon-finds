@@ -54,10 +54,10 @@ function App() {
         <div className="product-grid">
           {/* Example Product 1 */}
           <ProductCard 
-            title="Premium Wireless ANC Headphones"
-            description="Industry-leading noise cancellation with 30-hour battery life. Perfect for deep focus sessions in the homelab."
-            placeholderImg="🎧"
-            affiliateLink="https://amazon.com/"
+            title="Try Audible Premium Plus (Free Trial)"
+            description="Listen to thousands of audiobooks and podcasts. Sign up for a free trial today and get your first audiobook completely free!"
+            placeholderImg="📚"
+            affiliateLink="https://amzn.to/3RH54g5"
           />
 
           {/* Example Product 2 */}
