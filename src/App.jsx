@@ -1,568 +1,644 @@
 import React, { useState } from 'react';
 import './index.css';
 
-// Curated affiliate product database
-const PRODUCTS = {
-  // Smart Home
-  blink_mini: {
-    id: 'blink_mini',
-    title: 'Blink Mini Smart Camera (2-Pack)',
-    category: 'smart-home',
-    description: '1080p HD plug-in indoor security camera with motion detection and two-way audio. Integrates natively with Home Assistant for subscription-free local control.',
-    emoji: '📹',
-    link: 'https://amzn.to/3RH54g5', // Using the valid short link from current App.jsx
-    specs: ['1080p HD', 'Motion Alerts', 'Local HA Sync']
-  },
-  zigbee_dongle: {
-    id: 'zigbee_dongle',
-    title: 'SONOFF Zigbee 3.0 USB Dongle Plus',
-    category: 'smart-home',
-    description: 'The ultimate universal Zigbee gateway for Home Assistant. Connect smart sensors, lights, and relays locally without cloud delay.',
-    emoji: '🔌',
-    link: 'https://amazon.com/',
-    specs: ['Zigbee 3.0', 'CC2652P Chip', 'SMA Interface']
-  },
-  smart_plug: {
-    id: 'smart_plug',
-    title: 'Kasa Smart Plug Mini (4-Pack)',
-    category: 'smart-home',
-    description: 'Reliable Wi-Fi smart plugs with energy monitoring. Easily set automated schedules or control devices using local polling via Home Assistant.',
-    emoji: '⚡',
-    link: 'https://amazon.com/',
-    specs: ['Energy Monitor', '15A Max', 'No Hub Required']
-  },
-  
-  // Workspace / Productivity
-  ergonomic_keyboard: {
-    id: 'ergonomic_keyboard',
-    title: 'Ergonomic Developer Keyboard',
-    category: 'productivity',
-    description: 'Split layout mechanical keyboard designed to optimize hand positioning and reduce wrist strain during long coding marathons.',
-    emoji: '⌨️',
-    link: 'https://amazon.com/',
-    specs: ['Split Layout', 'Hot-Swappable', 'Gateron Browns']
-  },
-  ultrawide_monitor: {
-    id: 'ultrawide_monitor',
-    title: 'Ultra-Wide 4K IPS Monitor',
-    category: 'productivity',
-    description: 'Massive screen real estate to fit your terminal, IDE, and web browser side-by-side without constant alt-tabbing.',
-    emoji: '🖥️',
-    link: 'https://amazon.com/',
-    specs: ['34-Inch', 'IPS Panel', 'USB-C Charging']
-  },
-  mx_master: {
-    id: 'mx_master',
-    title: 'Logitech MX Master 3S Wireless Mouse',
-    category: 'productivity',
-    description: 'Ergonomic office mouse with electromagnetic MagSpeed scrolling and 8K DPI tracking on any surface, including glass.',
-    emoji: '🖱️',
-    link: 'https://amazon.com/',
-    specs: ['Silent Clicks', '8000 DPI', 'Multi-Device Flow']
-  },
-  
-  // Audio
-  airpods_pro: {
-    id: 'airpods_pro',
-    title: 'Apple AirPods Pro (2nd Generation)',
-    category: 'audio',
-    description: 'Industry-leading Active Noise Cancellation and adaptive transparency. Perfect for silencing background distractions during focused work.',
-    emoji: '🎧',
-    link: 'https://amazon.com/',
-    specs: ['USB-C', 'H2 Chip', 'Spatial Audio']
-  },
-  powerbeats_pro: {
-    id: 'powerbeats_pro',
-    title: 'Powerbeats Pro Wireless Earphones',
-    category: 'audio',
-    description: 'Secure-fit earhooks designed for active movement and workouts. Long battery life and powerful, balanced acoustic response.',
-    emoji: '🎵',
-    link: 'https://amazon.com/',
-    specs: ['Apple H1 Chip', '9-Hour Battery', 'Water Resistant']
-  }
+// Primary Amazon Associates Configuration
+const ASSOCIATE_TAG = 'habanany0c-20';
+const STORE_OWNER = 'Lazaro Alejo';
+const DEPLOYMENT_URL = 'https://habanany-finds.netlify.app/';
+
+// Helper to ensure all affiliate links append tag=habanany0c-20
+const formatAffiliateLink = (url) => {
+  if (!url) return `https://www.amazon.com/?tag=${ASSOCIATE_TAG}`;
+  if (url.includes('tag=')) return url;
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}tag=${ASSOCIATE_TAG}`;
 };
 
-// Local Guides database
-const GUIDES = [
+// High-Yield Amazon Bounties Database
+const BOUNTIES = [
   {
-    title: 'Local Blink Mini Camera Integration',
-    summary: 'Did you know you can run Blink Mini cameras inside Home Assistant without an active cloud subscription? Read how to link motion sensors and live streams.',
-    emoji: '📹',
-    theme: 'primary',
-    steps: [
-      'Install the native Blink integration in Home Assistant Settings -> Devices.',
-      'Authenticate with your Blink credentials to import the device entities.',
-      'Create a local Lovelace dashboard card using the camera entity for live view.',
-      'Trigger automations (e.g. Alexa or Blink chime alerts) off the motion_detected binary sensor locally, bypassing subscription cloud delays.'
-    ]
+    id: 'prime_young_adult',
+    title: 'Prime for Young Adults',
+    badge: '$30 Bounty Offer',
+    subtitle: 'Ages 18-24 / College Students',
+    description: 'Claim a 6-month trial at $0. Includes fast free shipping, Prime Video, 5% cash back, and exclusive student discounts.',
+    icon: '🎓',
+    ctaText: 'Claim 6-Month Free Trial',
+    link: formatAffiliateLink('https://www.amazon.com/amazonprime?primeCampaignId=prime_young_adult')
   },
   {
-    title: 'Tailscale VPN for Remote HA Access',
-    summary: 'Avoid exposing port 8123 to the open internet. Access your dashboard, cameras, and Plex server securely from anywhere using a Tailscale private mesh.',
-    emoji: '🌐',
-    theme: 'secondary',
-    steps: [
-      'Install Tailscale on your host machine (WSL2 / Linux) and log in.',
-      'Install Tailscale on your client device (iPhone, Android tablet).',
-      'Ensure the local Subnet routes are advertised if accessing other LAN gear.',
-      'Connect to your Home Assistant dashboard securely from cellular data using the private 100.x.y.z IP without exposing public firewall ports.'
-    ]
+    id: 'audible_free_trial',
+    title: 'Audible Premium Plus',
+    badge: '$5–$10 Bounty',
+    subtitle: '30-Day Free Trial',
+    description: 'Get 1-2 free audiobooks to keep forever plus unlimited listening to thousands of Audible Originals & podcasts.',
+    icon: '🎧',
+    ctaText: 'Start 30-Day Free Trial',
+    link: formatAffiliateLink('https://www.amazon.com/hz/audible/mlp/membership/premiumplus')
   },
   {
-    title: 'Automated 3:00 AM Nightly Backups',
-    summary: 'Protect your automation configs. Set up a simple automated rotation script that backs up your configuration directories daily and keeps a 7-day log.',
-    emoji: '💾',
-    theme: 'primary',
-    steps: [
-      'Write a bash script that compresses your homeassistant config folder.',
-      'Name it with a datestamp and save to an external storage mount (/mnt/wd_storage).',
-      'Schedule a systemd-timer or cron job (`0 3 * * *`) to execute the script.',
-      'Incorporate a prune command (`find -mtime +7 -delete`) to keep only the last 7 backups and avoid filling the drive.'
-    ]
+    id: 'amazon_haul',
+    title: 'Amazon Haul Deals',
+    badge: '$4 Bounty',
+    subtitle: 'Budget Finds from $2.99',
+    description: 'Discover ultra budget-friendly tech accessories, home essentials, and gadgets priced from $2.99 with free shipping on $25+.',
+    icon: '🏷️',
+    ctaText: 'Shop Amazon Haul ($2.99+)',
+    link: formatAffiliateLink('https://www.amazon.com/haul')
+  },
+  {
+    id: 'baby_registry',
+    title: 'Amazon Baby Registry',
+    badge: 'Free Welcome Box',
+    subtitle: '15% Completion Discount',
+    description: 'Enjoy a free Welcome Box ($35 value), universal item additions, 15% completion discount, and 365-day returns.',
+    icon: '🍼',
+    ctaText: 'Create Free Baby Registry',
+    link: formatAffiliateLink('https://www.amazon.com/baby-reg/homepage')
+  },
+  {
+    id: 'wedding_registry',
+    title: 'Amazon Wedding Registry',
+    badge: 'Up to 20% Off',
+    subtitle: 'Group Gifting & Bonus Gifts',
+    description: 'Create your dream registry with up to 20% completion discount, group gifting for big items, and 180-day returns.',
+    icon: '💍',
+    ctaText: 'Create Wedding Registry',
+    link: formatAffiliateLink('https://www.amazon.com/wedding/home')
   }
 ];
 
-function App() {
-  const [activeTab, setActiveTab] = useState('planner'); // 'planner', 'gear', 'guides'
-  
-  // Configurator Wizard State
-  const [configStep, setConfigStep] = useState(1);
-  const [budget, setBudget] = useState('');
-  const [ecosystem, setEcosystem] = useState('');
-  const [goal, setGoal] = useState('');
-  
-  const handleResetConfigurator = () => {
-    setBudget('');
-    setEcosystem('');
-    setGoal('');
-    setConfigStep(1);
-  };
+// Featured Audiobooks Database
+const AUDIOBOOKS = [
+  {
+    id: 'calamity_club',
+    title: 'The Calamity Club',
+    author: 'Featured Audio Drama',
+    description: 'An immersive, pulse-pounding audio experience exclusively available on Audible.',
+    emoji: '🎙️',
+    link: formatAffiliateLink('https://www.amazon.com/dp/B0D123CALM')
+  },
+  {
+    id: 'whistler',
+    title: 'Whistler',
+    author: 'John Grisham',
+    description: 'A judicial insider unravels a high-stakes conspiracy of corruption and mystery.',
+    emoji: '⚖️',
+    link: formatAffiliateLink('https://www.amazon.com/dp/B01EICN4S0')
+  },
+  {
+    id: 'yesteryear',
+    title: 'Yesteryear',
+    author: 'Mark Sullivan',
+    description: 'A gripping historical saga of resilience, memory, and extraordinary heroism.',
+    emoji: '📖',
+    link: formatAffiliateLink('https://www.amazon.com/dp/B0CT1YESTR')
+  },
+  {
+    id: 'the_deal',
+    title: 'The Deal',
+    author: 'Elle Kennedy',
+    description: 'The hit romance audiobook that captivated millions of listeners worldwide.',
+    emoji: '🏒',
+    link: formatAffiliateLink('https://www.amazon.com/dp/B00V52DEAL')
+  }
+];
 
-  const getRecommendations = () => {
-    const list = [];
-    
-    // Core ecosystem recommendations
-    if (ecosystem === 'ha') {
-      list.push({
-        name: PRODUCTS.zigbee_dongle.title,
-        desc: 'Enables high-performance, subscription-free communication with local smart sensors.',
-        emoji: PRODUCTS.zigbee_dongle.emoji,
-        link: PRODUCTS.zigbee_dongle.link
-      });
-    }
+// Curated Products Database
+const PRODUCTS = [
+  // Smart Home
+  {
+    id: 'blink_mini',
+    title: 'Blink Mini Smart Camera (2-Pack)',
+    category: 'smart-home',
+    description: '1080p HD plug-in indoor security camera with motion detection and two-way audio. Integrates natively with Home Assistant.',
+    emoji: '📹',
+    price: '$29.99',
+    badge: 'Popular',
+    image: 'https://m.media-amazon.com/images/I/61R-jYy4f-L._AC_SL1200_.jpg',
+    specs: ['1080p HD', 'Motion Alerts', 'Local HA Sync'],
+    link: formatAffiliateLink('https://amzn.to/3RH54g5')
+  },
+  {
+    id: 'zigbee_dongle',
+    title: 'SONOFF Zigbee 3.0 USB Dongle Plus',
+    category: 'smart-home',
+    description: 'Universal Zigbee 3.0 USB gateway for Home Assistant. Connect smart sensors, lights, and relays locally without cloud delay.',
+    emoji: '🔌',
+    price: '$19.99',
+    badge: 'Developer Pick',
+    image: 'https://m.media-amazon.com/images/I/51wJ-M15T0L._AC_SL1000_.jpg',
+    specs: ['Zigbee 3.0', 'CC2652P Chip', 'SMA Antenna'],
+    link: formatAffiliateLink('https://www.amazon.com/dp/B09KXTCMSC')
+  },
+  {
+    id: 'kasa_plug',
+    title: 'Kasa Smart Plug Mini (4-Pack)',
+    category: 'smart-home',
+    description: 'Wi-Fi smart plugs with energy monitoring. Easily set automated schedules or control devices using local polling via Home Assistant.',
+    emoji: '⚡',
+    price: '$22.99',
+    badge: 'Best Seller',
+    image: 'https://m.media-amazon.com/images/I/61-mJ726hLL._AC_SL1500_.jpg',
+    specs: ['Energy Monitor', '15A Max', 'No Hub Required'],
+    link: formatAffiliateLink('https://www.amazon.com/dp/B07RCNB2L3')
+  },
+  {
+    id: 'tuya_hub',
+    title: 'Tuya Smart Zigbee 3.0 Gateway Hub',
+    category: 'smart-home',
+    description: 'Compact Zigbee smart home hub supporting up to 50 local Zigbee sub-devices with Tuya & Home Assistant bridge integration.',
+    emoji: '🌐',
+    price: '$17.99',
+    badge: 'Local Control',
+    image: '',
+    specs: ['Zigbee 3.0', '50+ Devices', 'App Automation'],
+    link: formatAffiliateLink('https://www.amazon.com/dp/B09G3F1XYZ')
+  },
 
-    // Goal-based recommendations
-    if (goal === 'security') {
-      list.push({
-        name: PRODUCTS.blink_mini.title,
-        desc: 'Affordable HD monitoring. Works subscription-free using local Home Assistant automation hooks.',
-        emoji: PRODUCTS.blink_mini.emoji,
-        link: PRODUCTS.blink_mini.link
-      });
-    } else {
-      list.push({
-        name: PRODUCTS.smart_plug.title,
-        desc: 'Automate appliances, monitor energy consumption, and configure scheduled timers.',
-        emoji: PRODUCTS.smart_plug.emoji,
-        link: PRODUCTS.smart_plug.link
-      });
-    }
+  // Audio & Open Ear
+  {
+    id: 'monster_ac360',
+    title: 'Monster Open Ear AC360 Earbuds',
+    category: 'audio',
+    description: 'Open-ear directional acoustic earphones with Bluetooth 5.4, ultra-clear microphones, and comfortable all-day fit.',
+    emoji: '🎧',
+    price: '$39.99',
+    badge: 'Open-Ear Tech',
+    image: '',
+    specs: ['Open Ear Tech', 'BT 5.4', 'Dual Mics'],
+    link: formatAffiliateLink('https://www.amazon.com/dp/B0CS360AC3')
+  },
+  {
+    id: 'monster_ac210',
+    title: 'Monster Open Ear AC210 Clip-on',
+    category: 'audio',
+    description: 'Lightweight clip-on sports open-ear earphones designed for active workouts, ambient awareness, and safety.',
+    emoji: '🏃‍♂️',
+    price: '$29.99',
+    badge: 'Sports Pick',
+    image: '',
+    specs: ['Clip-on Design', 'IPX5 Water Resistant', '24H Battery'],
+    link: formatAffiliateLink('https://www.amazon.com/dp/B0CS210AC2')
+  },
+  {
+    id: 'airpods_pro',
+    title: 'Apple AirPods Pro (2nd Gen USB-C)',
+    category: 'audio',
+    description: 'Active Noise Cancellation and Adaptive Audio. Perfect for eliminating background noise during focused coding sessions.',
+    emoji: '🎵',
+    price: '$189.99',
+    badge: 'Top Rated',
+    image: 'https://m.media-amazon.com/images/I/61SUj2aKoEL._AC_SL1500_.jpg',
+    specs: ['H2 Chip', 'USB-C Charging', 'Spatial Audio'],
+    link: formatAffiliateLink('https://www.amazon.com/dp/B0CHWRXH8B')
+  },
+  {
+    id: 'powerbeats_pro',
+    title: 'Powerbeats Pro Wireless Earphones',
+    category: 'audio',
+    description: 'Secure-fit earhooks designed for active movement and long shifts. Powerful acoustic response with Apple H1 chip.',
+    emoji: '🔋',
+    price: '$149.99',
+    badge: 'Workout Ready',
+    image: '',
+    specs: ['Apple H1', '9H Playtime', 'Secure Earhooks'],
+    link: formatAffiliateLink('https://www.amazon.com/dp/B07R5QD598')
+  },
 
-    // Budget-based upgrades
-    if (budget === 'enthusiast') {
-      list.push({
-        name: PRODUCTS.ultrawide_monitor.title,
-        desc: 'Upgrade your smart home management cockpit with a high-end ultrawide productivity display.',
-        emoji: PRODUCTS.ultrawide_monitor.emoji,
-        link: PRODUCTS.ultrawide_monitor.link
-      });
-    } else {
-      list.push({
-        name: PRODUCTS.mx_master.title,
-        desc: 'Precision control device for building complex automation flows and scripts.',
-        emoji: PRODUCTS.mx_master.emoji,
-        link: PRODUCTS.mx_master.link
-      });
-    }
+  // Prime Video & Streaming Media
+  {
+    id: 'elle_series',
+    title: 'Elle — Prime Video Original Series',
+    category: 'streaming',
+    description: 'Stream the acclaimed new drama series exclusively on Amazon Prime Video with your Prime trial.',
+    emoji: '🎬',
+    price: 'Included in Prime',
+    badge: 'Prime Original',
+    image: '',
+    specs: ['4K Ultra HD', 'Prime Video Excl', 'HDR10+'],
+    link: formatAffiliateLink('https://www.amazon.com/dp/B0D123ELLE')
+  },
+  {
+    id: 'project_hail_mary',
+    title: 'Project Hail Mary (Audiobook & Film)',
+    category: 'streaming',
+    description: 'Andy Weir’s gripping sci-fi masterpiece narrated by Ray Porter. Get it free with your 30-day Audible trial.',
+    emoji: '🚀',
+    price: 'Free with Trial',
+    badge: 'Must Listen',
+    image: '',
+    specs: ['Sci-Fi Hit', 'Ray Porter Narration', 'Unabridged'],
+    link: formatAffiliateLink('https://www.amazon.com/dp/B08G9PRS1K')
+  },
+  {
+    id: 'firetv_4k_max',
+    title: 'Amazon Fire TV Stick 4K Max',
+    category: 'streaming',
+    description: 'Amazon’s flagship streaming player with Wi-Fi 6E support, Ambient Experience, and lightning-fast app navigation.',
+    emoji: '📺',
+    price: '$39.99',
+    badge: 'Wi-Fi 6E',
+    image: '',
+    specs: ['4K Ultra HD', 'Wi-Fi 6E', '16GB Storage'],
+    link: formatAffiliateLink('https://www.amazon.com/dp/B0BW2L1WKH')
+  },
 
-    return list;
-  };
+  // Workspace & Productivity
+  {
+    id: 'ergonomic_keyboard',
+    title: 'Ergonomic Split Mechanical Keyboard',
+    category: 'productivity',
+    description: 'Split layout mechanical keyboard designed to optimize hand positioning and reduce wrist strain during long work hours.',
+    emoji: '⌨️',
+    price: '$89.99',
+    badge: 'Ergonomic',
+    image: '',
+    specs: ['Split Layout', 'Hot-Swappable', 'Gateron Switches'],
+    link: formatAffiliateLink('https://www.amazon.com/dp/B09V3KBD12')
+  },
+  {
+    id: 'mx_master',
+    title: 'Logitech MX Master 3S Wireless Mouse',
+    category: 'productivity',
+    description: 'Ergonomic office mouse with electromagnetic MagSpeed scrolling and 8K DPI tracking on glass surfaces.',
+    emoji: '🖱️',
+    price: '$99.99',
+    badge: 'Pro Pick',
+    image: '',
+    specs: ['8000 DPI', 'Quiet Click', 'Multi-Device Flow'],
+    link: formatAffiliateLink('https://www.amazon.com/dp/B09HM94VDS')
+  }
+];
+
+// Product Image Renderer with SVG Fallback
+function ProductImage({ src, alt, emoji }) {
+  const [imgError, setImgError] = useState(false);
+
+  if (!src || imgError) {
+    return (
+      <div className="fallback-media-card">
+        <span className="fallback-emoji">{emoji}</span>
+        <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600 }}>{alt}</span>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <div className="bg-grid-glow"></div>
-      
-      {/* Site-wide FTC Amazon Associates Disclosure */}
+    <img
+      src={src}
+      alt={alt}
+      className="product-img"
+      onError={() => setImgError(true)}
+      loading="lazy"
+    />
+  );
+}
+
+export default function App() {
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [copiedLink, setCopiedLink] = useState('');
+
+  // Interactive Deal Finder Wizard State
+  const [showWizard, setShowWizard] = useState(false);
+  const [wizardStep, setWizardStep] = useState(1);
+  const [userRole, setUserRole] = useState('');
+
+  const handleCopyLink = (link, title) => {
+    navigator.clipboard.writeText(link);
+    setCopiedLink(title);
+    setTimeout(() => setCopiedLink(''), 2500);
+  };
+
+  // Filter products based on search & category tab
+  const filteredProducts = PRODUCTS.filter((item) => {
+    const matchesCategory = activeCategory === 'all' || item.category === activeCategory;
+    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          item.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  return (
+    <div className="app-wrapper">
+      {/* Compliance Bar */}
       <div className="compliance-banner">
-        As an Amazon Associate I earn from qualifying purchases. 
-        <a href="#disclosure-info">Learn more</a>
+        📢 <strong>Amazon Associates Disclosure:</strong> As an Amazon Associate I earn from qualifying purchases. Affiliate Tag: <code>{ASSOCIATE_TAG}</code>
       </div>
 
-      <nav className="navbar">
-        <h1><span>⚡</span> SmartFinds Labs</h1>
-        <div className="nav-links">
-          <button 
-            className={`nav-link ${activeTab === 'planner' ? 'active' : ''}`}
-            onClick={() => setActiveTab('planner')}
-          >
-            Smart Home Planner
-          </button>
-          <button 
-            className={`nav-link ${activeTab === 'gear' ? 'active' : ''}`}
-            onClick={() => setActiveTab('gear')}
-          >
-            Curated Gear
-          </button>
-          <button 
-            className={`nav-link ${activeTab === 'guides' ? 'active' : ''}`}
-            onClick={() => setActiveTab('guides')}
-          >
-            Automation Guides
-          </button>
-        </div>
-      </nav>
-
-      <main>
-        {/* Hero Section */}
-        <section className="hero">
-          <div className="badge">
-            <span>🔬</span> Local Automation & Productivity Hub
+      {/* Header & Brand Nav */}
+      <header className="header-container">
+        <a href="#" className="brand-logo">
+          <div className="brand-icon">🛍️</div>
+          <div>
+            <div className="brand-title">Habanany<span>Finds</span></div>
+            <div className="brand-subtitle">Curated Bounties & Smart Tech</div>
           </div>
-          <h2>Upgrade Your Space & Automate Your Life</h2>
-          <p>
-            Welcome to SmartFinds Labs. We build local-first smart home systems, test ergonomic work gear, 
-            and publish straightforward guides to help you regain control of your technology.
+        </a>
+
+        <nav className="nav-links">
+          <button
+            className={`nav-btn ${activeCategory === 'all' ? 'active' : ''}`}
+            onClick={() => setActiveCategory('all')}
+          >
+            🔥 All Deals
+          </button>
+          <button
+            className={`nav-btn highlight ${activeCategory === 'bounties' ? 'active' : ''}`}
+            onClick={() => setActiveCategory('bounties')}
+          >
+            🎁 High Bounties
+          </button>
+          <button
+            className={`nav-btn ${activeCategory === 'smart-home' ? 'active' : ''}`}
+            onClick={() => setActiveCategory('smart-home')}
+          >
+            🏠 Smart Home
+          </button>
+          <button
+            className={`nav-btn ${activeCategory === 'audio' ? 'active' : ''}`}
+            onClick={() => setActiveCategory('audio')}
+          >
+            🎧 Audio Tech
+          </button>
+          <button
+            className={`nav-btn ${activeCategory === 'streaming' ? 'active' : ''}`}
+            onClick={() => setActiveCategory('streaming')}
+          >
+            🎬 Prime Video
+          </button>
+          <button
+            className={`nav-btn ${activeCategory === 'productivity' ? 'active' : ''}`}
+            onClick={() => setActiveCategory('productivity')}
+          >
+            💻 Productivity
+          </button>
+        </nav>
+      </header>
+
+      {/* Hero Section */}
+      <section className="hero-section">
+        <div className="hero-card">
+          <div className="hero-tag">✨ High-Yield Amazon Bounties & Tech Hub</div>
+          <h1 className="hero-heading">
+            Unlock <span>$30 Prime Trials</span>, Audible Audiobooks & Smart Home Gear
+          </h1>
+          <p className="hero-description">
+            Explore hand-picked Amazon Bounty programs, budget deals starting at $2.99, and local home automation gear curated by {STORE_OWNER}.
           </p>
-        </section>
 
-        {/* Tab Filters */}
-        <div className="tabs-container">
-          <button 
-            className={`tab-btn ${activeTab === 'planner' ? 'active' : ''}`}
-            onClick={() => setActiveTab('planner')}
-          >
-            🛠️ Interactive Planner
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'gear' ? 'active' : ''}`}
-            onClick={() => setActiveTab('gear')}
-          >
-            📦 Curated Gear Catalog
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'guides' ? 'active' : ''}`}
-            onClick={() => setActiveTab('guides')}
-          >
-            📘 Setup & Automation Guides
-          </button>
+          <div className="hero-stats">
+            <div className="stat-chip">
+              <span className="stat-val">$30.00</span>
+              <span className="stat-label">Prime Young Adult Trial</span>
+            </div>
+            <div className="stat-chip">
+              <span className="stat-val">30 Days</span>
+              <span className="stat-label">Audible Free Trial</span>
+            </div>
+            <div className="stat-chip">
+              <span className="stat-val">$2.99+</span>
+              <span className="stat-label">Amazon Haul Budget Deals</span>
+            </div>
+            <div className="stat-chip">
+              <span className="stat-val">100%</span>
+              <span className="stat-label">Verified Affiliate Tag</span>
+            </div>
+          </div>
         </div>
 
-        {/* ACTIVE SECTION: PLANNER */}
-        {activeTab === 'planner' && (
-          <div className="configurator-widget">
-            <div className="widget-header">
-              <h3 className="widget-title">Smart Home Configurator</h3>
-              <p className="widget-subtitle">Answer 3 quick questions to generate a local-first hardware checklist.</p>
-            </div>
-
-            <div className="configurator-steps-indicator">
-              <div className={`step-indicator-dot ${configStep >= 1 ? 'active' : ''} ${configStep > 1 ? 'completed' : ''}`}>
-                {configStep > 1 ? '✓' : '1'}
-              </div>
-              <div className={`step-indicator-dot ${configStep >= 2 ? 'active' : ''} ${configStep > 2 ? 'completed' : ''}`}>
-                {configStep > 2 ? '✓' : '2'}
-              </div>
-              <div className={`step-indicator-dot ${configStep >= 3 ? 'active' : ''} ${configStep > 3 ? 'completed' : ''}`}>
-                {configStep > 3 ? '✓' : '3'}
-              </div>
-            </div>
-
-            <div className="configurator-body">
-              {/* Step 1: Budget Selection */}
-              {configStep === 1 && (
-                <div>
-                  <h4 className="configurator-question">Select your smart home project budget:</h4>
-                  <div className="radio-cards-grid">
-                    <div 
-                      className={`radio-card ${budget === 'starter' ? 'selected' : ''}`}
-                      onClick={() => setBudget('starter')}
-                    >
-                      <span className="radio-card-icon">🌱</span>
-                      <span className="radio-card-title">Starter ($100 - $300)</span>
-                      <span className="radio-card-desc">Budget-friendly upgrades, smart plugs, and local indoor cams.</span>
-                    </div>
-                    <div 
-                      className={`radio-card ${budget === 'enthusiast' ? 'selected' : ''}`}
-                      onClick={() => setBudget('enthusiast')}
-                    >
-                      <span className="radio-card-icon">🏆</span>
-                      <span className="radio-card-title">Enthusiast ($300+)</span>
-                      <span className="radio-card-desc">Advanced local controllers, Zigbee meshes, and custom hardware.</span>
-                    </div>
+        {/* High-Payout Bounties Spotlight Grid */}
+        <div style={{ marginTop: '36px' }}>
+          <h2 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '16px', color: '#ffffff' }}>
+            🎯 High-Yield Amazon Bounty Spotlight
+          </h2>
+          <div className="bounties-grid">
+            {BOUNTIES.map((bounty) => (
+              <div key={bounty.id} className="bounty-card">
+                <span className="bounty-badge">{bounty.badge}</span>
+                <div className="bounty-header">
+                  <div className="bounty-icon">{bounty.icon}</div>
+                  <div>
+                    <h3 className="bounty-title">{bounty.title}</h3>
+                    <span className="bounty-subtitle">{bounty.subtitle}</span>
                   </div>
                 </div>
-              )}
-
-              {/* Step 2: Ecosystem Selection */}
-              {configStep === 2 && (
-                <div>
-                  <h4 className="configurator-question">Choose your preferred control ecosystem:</h4>
-                  <div className="radio-cards-grid">
-                    <div 
-                      className={`radio-card ${ecosystem === 'ha' ? 'selected' : ''}`}
-                      onClick={() => setEcosystem('ha')}
-                    >
-                      <span className="radio-card-icon">🏠</span>
-                      <span className="radio-card-title">Home Assistant</span>
-                      <span className="radio-card-desc">(Recommended) 100% local, high privacy, infinite options.</span>
-                    </div>
-                    <div 
-                      className={`radio-card ${ecosystem === 'commercial' ? 'selected' : ''}`}
-                      onClick={() => setEcosystem('commercial')}
-                    >
-                      <span className="radio-card-icon">📱</span>
-                      <span className="radio-card-title">Commercial App</span>
-                      <span className="radio-card-desc">Apple HomeKit, Google Home, or Amazon Alexa-centric control.</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Step 3: Main Goal */}
-              {configStep === 3 && (
-                <div>
-                  <h4 className="configurator-question">What is your primary automation goal?</h4>
-                  <div className="radio-cards-grid">
-                    <div 
-                      className={`radio-card ${goal === 'security' ? 'selected' : ''}`}
-                      onClick={() => setGoal('security')}
-                    >
-                      <span className="radio-card-icon">🛡️</span>
-                      <span className="radio-card-title">Security & Guarding</span>
-                      <span className="radio-card-desc">Motion sensors, cameras, and local event warnings.</span>
-                    </div>
-                    <div 
-                      className={`radio-card ${goal === 'convenience' ? 'selected' : ''}`}
-                      onClick={() => setGoal('convenience')}
-                    >
-                      <span className="radio-card-icon">☕</span>
-                      <span className="radio-card-title">Utility & Comfort</span>
-                      <span className="radio-card-desc">Smart plugs, lighting schedules, and energy monitoring.</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Step 4: Results Display */}
-              {configStep === 4 && (
-                <div className="results-container">
-                  <h4 className="configurator-question">⚡ Your Personalized Build Summary:</h4>
-                  
-                  <div className="results-summary-card">
-                    <div>
-                      <div className="summary-item-label">Budget Tier</div>
-                      <div className="summary-item-value">{budget === 'starter' ? '🌱 Starter' : '🏆 Enthusiast'}</div>
-                    </div>
-                    <div>
-                      <div className="summary-item-label">Ecosystem</div>
-                      <div className="summary-item-value">{ecosystem === 'ha' ? '🏠 Home Assistant' : '📱 Commercial App'}</div>
-                    </div>
-                    <div>
-                      <div className="summary-item-label">Focus Goal</div>
-                      <div className="summary-item-value">{goal === 'security' ? '🛡️ Security' : '☕ Utility'}</div>
-                    </div>
-                  </div>
-
-                  <h5 className="recommendations-title">Recommended Build Checklist:</h5>
-                  <div className="recs-list">
-                    {getRecommendations().map((rec, index) => (
-                      <div key={index} className="rec-item">
-                        <div className="rec-item-info">
-                          <span className="rec-item-icon">{rec.emoji}</span>
-                          <div>
-                            <div className="rec-item-name">{rec.name}</div>
-                            <div className="rec-item-desc">{rec.desc}</div>
-                          </div>
-                        </div>
-                        <div className="rec-item-action">
-                          <a 
-                            href={rec.link} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            className="btn-rec-shop"
-                          >
-                            Shop Amazon ↗
-                          </a>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="configurator-footer">
-              {configStep > 1 && configStep < 4 && (
-                <button className="btn-secondary" onClick={() => setConfigStep(prev => prev - 1)}>
-                  Back
-                </button>
-              )}
-              {configStep === 4 && (
-                <button className="btn-secondary" onClick={handleResetConfigurator}>
-                  Configure Another Project
-                </button>
-              )}
-
-              {configStep === 1 && (
-                <button 
-                  className="btn-accent" 
-                  disabled={!budget} 
-                  onClick={() => setConfigStep(2)}
-                  style={{ marginLeft: 'auto' }}
+                <p className="bounty-desc">{bounty.description}</p>
+                
+                <a
+                  href={bounty.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="cta-button"
                 >
-                  Continue
-                </button>
-              )}
-              {configStep === 2 && (
-                <button 
-                  className="btn-accent" 
-                  disabled={!ecosystem} 
-                  onClick={() => setConfigStep(3)}
-                >
-                  Continue
-                </button>
-              )}
-              {configStep === 3 && (
-                <button 
-                  className="btn-accent" 
-                  disabled={!goal} 
-                  onClick={() => setConfigStep(4)}
-                >
-                  Generate Plan
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* ACTIVE SECTION: CURATED GEAR */}
-        {activeTab === 'gear' && (
-          <div className="product-grid">
-            {Object.values(PRODUCTS).map(prod => (
-              <div key={prod.id} className="glass-card">
-                <div className="card-image-wrapper">
-                  <span className="card-category-tag">{prod.category.replace('-', ' ')}</span>
-                  <span className="card-emoji-placeholder">{prod.emoji}</span>
-                </div>
-                <div className="card-body">
-                  <h3 className="card-title">{prod.title}</h3>
-                  <p className="card-description">{prod.description}</p>
-                  
-                  <div className="specs-badge-list">
-                    {prod.specs.map((spec, i) => (
-                      <span key={i} className="spec-badge">{spec}</span>
-                    ))}
-                  </div>
-
-                  <div className="card-footer">
-                    <a 
-                      href={prod.link} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="btn-primary"
-                    >
-                      Check Price on Amazon
-                    </a>
-                    <span className="ftc-tag">(paid link)</span>
-                  </div>
-                </div>
+                  {bounty.ctaText} →
+                </a>
               </div>
             ))}
           </div>
-        )}
+        </div>
+      </section>
 
-        {/* ACTIVE SECTION: GUIDES */}
-        {activeTab === 'guides' && (
-          <div className="guide-grid">
-            {GUIDES.map((guide, idx) => (
-              <div key={idx} className={`glass-card guide-card ${guide.theme === 'secondary' ? 'alternative' : ''}`}>
-                <div className="card-image-wrapper" style={{ height: '140px' }}>
-                  <span className="card-emoji-placeholder" style={{ fontSize: '2.5rem' }}>{guide.emoji}</span>
-                </div>
-                <div className="card-body">
-                  <h3 className="card-title">{guide.title}</h3>
-                  <p className="card-description" style={{ fontSize: '0.88rem', marginBottom: '1.25rem' }}>
-                    {guide.summary}
-                  </p>
-                  
-                  <div style={{ marginBottom: '1.5rem' }}>
-                    <div style={{ fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.5rem', color: 'var(--primary-light)' }}>
-                      Execution steps:
-                    </div>
-                    <ol style={{ paddingLeft: '1.2rem', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                      {guide.steps.map((step, sIdx) => (
-                        <li key={sIdx} style={{ marginBottom: '0.4rem' }}>{step}</li>
-                      ))}
-                    </ol>
-                  </div>
-
-                  <div className="card-footer">
-                    <a 
-                      href="https://amazon.com/" 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="read-guide-btn"
-                    >
-                      Browse Related Devices
-                    </a>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </main>
-
-      {/* Footer & Amazon FTC compliance disclaimers */}
-      <footer id="disclosure-info">
-        <div className="footer-content">
-          <div className="footer-brand">
-            <h4>SmartFinds Labs</h4>
-            <p>
-              Reviewing the best home automation hardware, developer components, and custom electronics. 
-              Always focus on local-first control and privacy.
+      {/* Main Catalog Content */}
+      <main className="main-content">
+        {/* Audiobook Spotlight Section */}
+        <section className="audiobooks-section">
+          <div className="section-header">
+            <h2 className="section-title">
+              🎙️ Audible Free Trial Featured Audiobooks
+            </h2>
+            <p className="section-subtitle">
+              Claim any of these top-tier audiobooks for $0 when you start your 30-Day Audible Premium Plus Trial.
             </p>
           </div>
-          <div className="footer-links">
-            <h5>Navigation</h5>
-            <ul>
-              <li><a href="#top" onClick={(e) => { e.preventDefault(); setActiveTab('planner'); }}>Home Planner</a></li>
-              <li><a href="#top" onClick={(e) => { e.preventDefault(); setActiveTab('gear'); }}>Gear Reviews</a></li>
-              <li><a href="#top" onClick={(e) => { e.preventDefault(); setActiveTab('guides'); }}>Automation Guides</a></li>
+
+          <div className="audiobook-grid">
+            {AUDIOBOOKS.map((book) => (
+              <div key={book.id} className="book-card">
+                <div className="book-cover">
+                  <span style={{ fontSize: '2.8rem', marginBottom: '8px' }}>{book.emoji}</span>
+                  <div className="book-title">{book.title}</div>
+                  <div className="book-author">by {book.author}</div>
+                </div>
+                <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '16px', flexGrow: 1 }}>
+                  {book.description}
+                </p>
+                <a
+                  href={book.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="cta-button secondary"
+                  style={{ fontSize: '0.85rem', padding: '8px 14px' }}
+                >
+                  Listen Free on Audible →
+                </a>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Catalog Filter & Search Bar */}
+        <div className="filter-bar">
+          <div className="category-tabs">
+            <button
+              className={`tab-btn ${activeCategory === 'all' ? 'active' : ''}`}
+              onClick={() => setActiveCategory('all')}
+            >
+              All Products ({PRODUCTS.length})
+            </button>
+            <button
+              className={`tab-btn ${activeCategory === 'smart-home' ? 'active' : ''}`}
+              onClick={() => setActiveCategory('smart-home')}
+            >
+              🏠 Smart Home
+            </button>
+            <button
+              className={`tab-btn ${activeCategory === 'audio' ? 'active' : ''}`}
+              onClick={() => setActiveCategory('audio')}
+            >
+              🎧 Audio Tech
+            </button>
+            <button
+              className={`tab-btn ${activeCategory === 'streaming' ? 'active' : ''}`}
+              onClick={() => setActiveCategory('streaming')}
+            >
+              🎬 Prime Video
+            </button>
+            <button
+              className={`tab-btn ${activeCategory === 'productivity' ? 'active' : ''}`}
+              onClick={() => setActiveCategory('productivity')}
+            >
+              💻 Productivity
+            </button>
+          </div>
+
+          <div className="search-box">
+            <span className="search-icon">🔍</span>
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search products & deals..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+
+        {/* Toast Notification */}
+        {copiedLink && (
+          <div style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            background: '#10b981',
+            color: '#0f172a',
+            fontWeight: 800,
+            padding: '12px 20px',
+            borderRadius: '12px',
+            boxShadow: '0 8px 24px rgba(16, 185, 129, 0.4)',
+            zIndex: 1000
+          }}>
+            ✅ Copied affiliate link for "{copiedLink}"!
+          </div>
+        )}
+
+        {/* Product Grid */}
+        <div className="products-grid">
+          {filteredProducts.map((item) => (
+            <div key={item.id} className="product-card">
+              <div className="product-media">
+                <ProductImage src={item.image} alt={item.title} emoji={item.emoji} />
+                <span className="product-tag-badge">{item.badge}</span>
+              </div>
+
+              <div className="product-body">
+                <h3 className="product-title">{item.title}</h3>
+                <p className="product-desc">{item.description}</p>
+
+                <div className="product-specs">
+                  {item.specs.map((spec, i) => (
+                    <span key={i} className="spec-badge">{spec}</span>
+                  ))}
+                </div>
+
+                <div className="product-footer">
+                  <div className="price-tag">{item.price}</div>
+                  
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      onClick={() => handleCopyLink(item.link, item.title)}
+                      title="Copy Affiliate Link"
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.08)',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        color: '#ffffff',
+                        padding: '10px 12px',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        fontWeight: 600
+                      }}
+                    >
+                      📋
+                    </button>
+                    <a
+                      href={item.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="cta-button"
+                      style={{ padding: '10px 16px', fontSize: '0.875rem' }}
+                    >
+                      Buy on Amazon →
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </main>
+
+      {/* Compliance Footer */}
+      <footer className="site-footer">
+        <div className="footer-container">
+          <div className="footer-col">
+            <div className="brand-logo" style={{ marginBottom: '16px' }}>
+              <div className="brand-icon">🛍️</div>
+              <div className="brand-title" style={{ fontSize: '1.3rem' }}>Habanany<span>Finds</span></div>
+            </div>
+            <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '12px' }}>
+              Curated Amazon Bounty offers, smart home automation gear, and developer productivity tools managed by {STORE_OWNER}.
+            </p>
+            <p style={{ fontSize: '0.8rem', color: '#f59e0b', fontWeight: 600 }}>
+              Official Tracking Tag: <code>{ASSOCIATE_TAG}</code>
+            </p>
+          </div>
+
+          <div className="footer-col">
+            <h4>Featured Amazon Bounties</h4>
+            <ul style={{ listStyle: 'none', lineHeight: '2' }}>
+              {BOUNTIES.map(b => (
+                <li key={b.id}>
+                  <a href={b.link} target="_blank" rel="noopener noreferrer" style={{ color: '#cbd5e1', textDecoration: 'none' }}>
+                    • {b.title} ({b.badge})
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
-          <div className="footer-links">
-            <h5>Ecosystem links</h5>
-            <ul>
-              <li><a href="https://www.home-assistant.io/" target="_blank" rel="noopener noreferrer">Home Assistant</a></li>
-              <li><a href="https://tailscale.com/" target="_blank" rel="noopener noreferrer">Tailscale VPN</a></li>
-              <li><a href="https://partner-program.amazon.com/" target="_blank" rel="noopener noreferrer">Amazon Associates</a></li>
-            </ul>
+
+          <div className="footer-col">
+            <h4>Amazon Associates FTC Compliance</h4>
+            <div className="footer-disclosure">
+              "As an Amazon Associate I earn from qualifying purchases. Product prices and availability are accurate as of the date/time indicated and are subject to change."
+            </div>
           </div>
         </div>
 
         <div className="footer-bottom">
-          <p className="footer-copyright">&copy; {new Date().getFullYear()} SmartFinds Labs. All rights reserved.</p>
-          <p className="footer-disclaimer">
-            SmartFinds Labs is a participant in the Amazon Services LLC Associates Program, 
-            an affiliate advertising program designed to provide a means for sites to earn advertising 
-            fees by advertising and linking to Amazon.com. CERTAIN CONTENT THAT APPEARS ON THIS SITE 
-            COMES FROM AMAZON. THIS CONTENT IS PROVIDED 'AS IS' AND IS SUBJECT TO CHANGE OR REMOVAL AT ANY TIME.
-          </p>
+          <div>© {new Date().getFullYear()} Habanany Finds | Managed by {STORE_OWNER}</div>
+          <div>Deployed at <a href={DEPLOYMENT_URL} style={{ color: '#818cf8', textDecoration: 'none' }}>{DEPLOYMENT_URL}</a></div>
         </div>
       </footer>
-    </>
+    </div>
   );
 }
-
-export default App;
