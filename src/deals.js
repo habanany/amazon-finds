@@ -51,6 +51,12 @@ export const deals = [
 
 export const bounties = [
   {
+    id: 'prime-big-deal-days',
+    title: 'Prime Big Deal Days is Oct 6-7',
+    description: 'Amazon’s Prime member-only sale runs October 6 and 7. Not a member yet? Amazon lists current Prime plans, including Prime for Young Adults, with eligibility and trial terms on its own page. Check them there before you sign up.',
+    url: withAssociateTag('https://www.amazon.com/amazonprime'),
+  },
+  {
     id: 'prime-young-adult',
     title: 'Prime for Young Adults',
     description: 'See Amazon’s current eligibility details and trial terms for young adults and eligible students.',
